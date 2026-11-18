@@ -35,6 +35,7 @@ inputs:
 | `base` | treefmt and git hook, nixfmt, actionlint, ast-grep, conftest; `repo:lint` runs the shared rules then `scripts/lint.sh`; `repo:check` runs `scripts/check.sh` after `repo:lint` |
 | `go` | Go toolchain, golangci-lint, gofumpt, gremlins with `repo.gremlins.enable`; `.golangci.yml` generated from `repo.golangci` over a shared base (gitignore it) |
 | `python` | Python 3.12 by default, uv with one `.venv` per project, ruff, tzdata |
+| `sqlc` | sqlc, goose, sqls; `codegen:sqlc` runs `sqlc generate` beside every `sqlc.yaml`, and `repo:lint` fails when generated code is stale (`sqlc diff`) |
 | `kubernetes` | Helm, kubectl |
 | `opentofu` | OpenTofu |
 
