@@ -18,13 +18,15 @@ on:
         type: string
         default: ""
       cache-key:
+        description: Prefix of the cache key; each run saves a new entry and restores the newest one with the same prefix and hash.
         type: string
         default: ""
-      cache-restore-keys:
-        description: Prefixes to restore from when cache-key has no exact match, one per line.
+      cache-hash-files:
+        description: Glob whose content hash is part of the cache key.
         type: string
-        default: ""
+        default: devenv.lock
       artifact-name:
+        description: Artifact name; slashes become dashes.
         type: string
         default: ""
       artifact-path:
@@ -56,17 +58,24 @@ jobs:
         if: inputs.cache-path != ''
         with:
           path: ${{ inputs.cache-path }}
-          key: ${{ inputs.cache-key }}
-          restore-keys: ${{ inputs.cache-restore-keys }}
+          key: ${{ inputs.cache-key }}-${{ hashFiles(inputs.cache-hash-files) }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ inputs.cache-key }}-${{ hashFiles(inputs.cache-hash-files) }}-
+            ${{ inputs.cache-key }}-
       - name: Install devenv
         run: nix profile add nixpkgs#devenv
       - name: Run
         env:
           RUN: ${{ inputs.run }}
         run: devenv shell -- bash -euo pipefail -c "$RUN"
+      - id: artifact
+        if: always() && inputs.artifact-path != ''
+        env:
+          NAME: ${{ inputs.artifact-name }}
+        run: echo "name=${NAME//\//-}" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v7.0.2
         if: always() && inputs.artifact-path != ''
         with:
-          name: ${{ inputs.artifact-name }}
+          name: ${{ steps.artifact.outputs.name }}
           path: ${{ inputs.artifact-path }}
           if-no-files-found: warn

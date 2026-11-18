@@ -50,6 +50,6 @@ jobs:
       run: devenv tasks run repo:check
 ```
 
-The workflow also takes `fetch-depth`, `timeout-minutes`, `cache-path`/`cache-key`/`cache-restore-keys` for extra caches, and `artifact-name`/`artifact-path` to upload results even when the run fails.
+The workflow also takes `fetch-depth`, `timeout-minutes`, `cache-path`/`cache-key`/`cache-hash-files` for extra caches, and `artifact-name`/`artifact-path` to upload results even when the run fails.
 
 Update a project with `devenv update devenv-modules`. To try local changes first, run `devenv shell --override-input devenv-modules path:../devenv-modules`.
