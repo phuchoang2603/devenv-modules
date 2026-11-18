@@ -38,7 +38,7 @@ inputs:
 | `kubernetes` | Helm, kubectl |
 | `opentofu` | OpenTofu |
 
-Each project provides `scripts/lint.sh` (static checks, no tests) and `scripts/check.sh` (tests and anything else CI runs). Project-specific ast-grep rules go in a root `sgconfig.yml`; `repo.lintIgnores` excludes generated files without a generated-code header from the shared rules.
+Each project provides `scripts/lint.sh` (static checks, no tests) and an optional `scripts/check.sh` (tests and anything else CI runs). Project-specific ast-grep rules go in a root `sgconfig.yml`; `repo.lintIgnores` excludes generated files without a generated-code header from the shared rules.
 
 CI runs the same tasks inside devenv:
 

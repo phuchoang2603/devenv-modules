@@ -56,7 +56,11 @@ in
       bash "${config.git.root}/scripts/lint.sh"
     '';
     tasks."repo:check" = {
-      exec = ''bash "${config.git.root}/scripts/check.sh"'';
+      exec = ''
+        if [[ -f "${config.git.root}/scripts/check.sh" ]]; then
+          bash "${config.git.root}/scripts/check.sh"
+        fi
+      '';
       after = [ "repo:lint" ];
     };
   };
