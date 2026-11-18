@@ -15,14 +15,21 @@ let
   };
   sharedLint = pkgs.writeShellApplication {
     name = "repo-lint-shared";
-    runtimeInputs = [ pkgs.ast-grep ];
+    runtimeInputs = [
+      pkgs.ast-grep
+      pkgs.conftest
+    ];
     text = ''
       cd "${config.git.root}"
       ast-grep scan --config ${rules}/sgconfig.yml ${
         lib.concatMapStringsSep " " (glob: lib.escapeShellArg "--globs=!${glob}") cfg.lintIgnores
       } .
       if [[ -f sgconfig.yml ]]; then
+        ast-grep test --skip-snapshot-tests
         ast-grep scan .
+      fi
+      if [[ -d policy ]]; then
+        conftest verify --policy policy
       fi
     '';
   };

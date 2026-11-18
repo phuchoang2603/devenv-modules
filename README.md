@@ -33,12 +33,12 @@ inputs:
 | Module | Provides |
 |---|---|
 | `base` | treefmt and git hook, nixfmt, actionlint, ast-grep, conftest; `repo:lint` runs the shared rules then `scripts/lint.sh`; `repo:check` runs `scripts/check.sh` after `repo:lint` |
-| `go` | Go toolchain, golangci-lint, gofumpt; `.golangci.yml` generated from `repo.golangci` over a shared base (gitignore it) |
+| `go` | Go toolchain, golangci-lint, gofumpt, gremlins with `repo.gremlins.enable`; `.golangci.yml` generated from `repo.golangci` over a shared base (gitignore it) |
 | `python` | Python 3.12 by default, uv with one `.venv` per project, ruff, tzdata |
 | `kubernetes` | Helm, kubectl |
 | `opentofu` | OpenTofu |
 
-Each project provides `scripts/lint.sh` (static checks, no tests) and an optional `scripts/check.sh` (tests and anything else CI runs). Project-specific ast-grep rules go in a root `sgconfig.yml`; `repo.lintIgnores` excludes generated files without a generated-code header from the shared rules.
+Each project provides `scripts/lint.sh` (static checks, no tests) and an optional `scripts/check.sh` (tests and anything else CI runs). Project-specific ast-grep rules go in a root `sgconfig.yml` (with tests under its `testConfigs`) and Rego policies in `policy/`; `repo:lint` runs both rule and policy tests; `repo.lintIgnores` excludes generated files without a generated-code header from the shared rules.
 
 CI runs the same tasks inside devenv:
 
@@ -49,5 +49,7 @@ jobs:
     with:
       run: devenv tasks run repo:check
 ```
+
+The workflow also takes `fetch-depth`, `timeout-minutes`, `cache-path`/`cache-key`/`cache-restore-keys` for extra caches, and `artifact-name`/`artifact-path` to upload results even when the run fails.
 
 Update a project with `devenv update devenv-modules`. To try local changes first, run `devenv shell --override-input devenv-modules path:../devenv-modules`.

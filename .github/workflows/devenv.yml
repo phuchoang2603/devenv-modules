@@ -13,6 +13,24 @@ on:
       timeout-minutes:
         type: number
         default: 30
+      cache-path:
+        description: Extra paths to cache between runs, one per line.
+        type: string
+        default: ""
+      cache-key:
+        type: string
+        default: ""
+      cache-restore-keys:
+        description: Prefixes to restore from when cache-key has no exact match, one per line.
+        type: string
+        default: ""
+      artifact-name:
+        type: string
+        default: ""
+      artifact-path:
+        description: Paths to upload as an artifact after the run, even when it fails.
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -34,9 +52,21 @@ jobs:
           primary-key: devenv-${{ runner.os }}-${{ hashFiles('**/devenv.lock', '**/devenv.nix') }}
           restore-prefixes-first-match: devenv-${{ runner.os }}-
           gc-max-store-size-linux: 8G
+      - uses: actions/cache@v4
+        if: inputs.cache-path != ''
+        with:
+          path: ${{ inputs.cache-path }}
+          key: ${{ inputs.cache-key }}
+          restore-keys: ${{ inputs.cache-restore-keys }}
       - name: Install devenv
         run: nix profile add nixpkgs#devenv
       - name: Run
         env:
           RUN: ${{ inputs.run }}
         run: devenv shell -- bash -euo pipefail -c "$RUN"
+      - uses: actions/upload-artifact@v7.0.2
+        if: always() && inputs.artifact-path != ''
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.artifact-path }}
+          if-no-files-found: warn

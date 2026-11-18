@@ -8,6 +8,8 @@ let
   yaml = pkgs.formats.yaml { };
 in
 {
+  options.repo.gremlins.enable = lib.mkEnableOption "the gremlins mutation tester";
+
   options.repo.golangci = lib.mkOption {
     inherit (yaml) type;
     default = { };
@@ -21,11 +23,18 @@ in
       lsp.enable = true;
     };
 
-    packages = [ pkgs.golangci-lint ];
+    packages = [
+      pkgs.golangci-lint
+    ]
+    ++ lib.optional config.repo.gremlins.enable (pkgs.callPackage ./pkgs/gremlins.nix { });
 
     repo.golangci = {
       version = "2";
-      run.tests = lib.mkDefault true;
+      run = {
+        tests = lib.mkDefault true;
+        allow-parallel-runners = true;
+        relative-path-mode = lib.mkDefault "gitroot";
+      };
       linters = {
         default = lib.mkDefault "standard";
         enable = [
