@@ -64,7 +64,7 @@ jobs:
             ${{ inputs.cache-key }}-
       - id: toolchain-key
         env:
-          KEY: toolchain-${{ inputs.cache-key || github.job }}-${{ hashFiles('**/go.sum', '**/uv.lock') }}
+          KEY: toolchain-${{ inputs.cache-key || github.job }}-${{ hashFiles('**/go.sum', '**/uv.lock', '**/pom.xml') }}
         run: echo "key=$KEY" >> "$GITHUB_OUTPUT"
       - uses: actions/cache/restore@v4
         id: toolchain
@@ -72,6 +72,7 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/.cache/uv
+            ~/.m2/repository
             .devenv/state/go/pkg/mod
           key: ${{ steps.toolchain-key.outputs.key }}
           restore-keys: toolchain-${{ inputs.cache-key || github.job }}-
@@ -87,6 +88,7 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/.cache/uv
+            ~/.m2/repository
             .devenv/state/go/pkg/mod
           key: ${{ steps.toolchain-key.outputs.key }}
       - id: artifact
