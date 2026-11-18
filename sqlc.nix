@@ -11,7 +11,6 @@ in
   config = {
     packages = [
       pkgs.sqlc
-      pkgs.goose
       pkgs.sqls
     ];
 
