@@ -1,0 +1,33 @@
+id: no-comments-go
+language: go
+severity: error
+message: Comments are not allowed; prefer names, types and checks.
+note: Keep a comment only for a non-obvious invariant, protocol quirk or security caveat, and prefix it with NOTE.
+ignores:
+  - "**/.terraform.lock.hcl"
+rule:
+  kind: comment
+  not:
+    any:
+      - regex: '^//(go:|nolint|lint:|line |export |extern )|^// ?NOTE:'
+      - inside:
+          stopBy: end
+          has:
+            kind: comment
+            regex: '(?i)generated.*do not edit'
+      - precedes:
+          stopBy:
+            not:
+              kind: comment
+          any:
+            - kind: function_declaration
+            - kind: method_declaration
+            - kind: type_declaration
+            - kind: const_declaration
+            - kind: var_declaration
+            - kind: package_clause
+            - kind: field_declaration
+            - kind: method_elem
+            - kind: const_spec
+            - kind: var_spec
+            - kind: type_spec

@@ -1,0 +1,18 @@
+id: no-comments-nix
+language: nix
+severity: error
+message: Comments are not allowed; prefer names, types and checks.
+note: Keep a comment only for a non-obvious invariant, protocol quirk or security caveat, and prefix it with NOTE.
+ignores:
+  - "**/.terraform.lock.hcl"
+rule:
+  kind: comment
+  not:
+    any:
+      - regex: '^# ?NOTE:'
+      - inside:
+          stopBy: end
+          has:
+            kind: comment
+            regex: '(?i)generated.*do not edit'
+

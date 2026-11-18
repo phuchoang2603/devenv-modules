@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: cachix/install-nix-action@v31
+      - name: Rule tests
+        run: nix shell nixpkgs#ast-grep -c ast-grep test --skip-snapshot-tests
+      - name: Rules pass on this repo
+        run: nix shell nixpkgs#ast-grep -c ast-grep scan .
+      - name: Nix and workflow format
+        run: nix shell nixpkgs#nixfmt nixpkgs#actionlint -c bash -c 'nixfmt --check ./*.nix && actionlint'

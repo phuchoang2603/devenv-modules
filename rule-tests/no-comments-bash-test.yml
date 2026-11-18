@@ -1,0 +1,10 @@
+id: no-comments-bash
+valid:
+  - |
+    #!/usr/bin/env bash
+    # shellcheck disable=SC2086
+    echo $x
+invalid:
+  - |
+    # run the build
+    make

@@ -1,0 +1,11 @@
+id: no-comments-python
+valid:
+  - |
+    #!/usr/bin/env python3
+    import os  # noqa: F401
+  - |
+    x = 1  # NOTE: the upstream API is one-based
+invalid:
+  - |
+    # load the config
+    x = 1
