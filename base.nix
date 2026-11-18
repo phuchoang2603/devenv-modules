@@ -5,7 +5,6 @@
   ...
 }:
 let
-  cfg = config.repo;
   rules = lib.fileset.toSource {
     root = ./.;
     fileset = lib.fileset.unions [
@@ -15,12 +14,19 @@ let
   };
   sharedLint = pkgs.writeShellApplication {
     name = "repo-lint-shared";
-    runtimeInputs = [ pkgs.ast-grep ];
+    runtimeInputs = [
+      pkgs.ast-grep
+      pkgs.git
+    ];
     text = ''
       cd "${config.git.root}"
-      ast-grep scan --config ${rules}/sgconfig.yml ${
-        lib.concatMapStringsSep " " (glob: lib.escapeShellArg "--globs=!${glob}") cfg.lintIgnores
-      } .
+      args=()
+      while IFS= read -r -d "" path && IFS= read -r -d "" _ && IFS= read -r -d "" value; do
+        if [[ "$value" == true ]]; then
+          args+=("--globs=!$path")
+        fi
+      done < <(git ls-files -z | git check-attr -z --stdin linguist-generated)
+      ast-grep scan --config ${rules}/sgconfig.yml "''${args[@]}" .
       if [[ -f sgconfig.yml ]]; then
         ast-grep scan .
       fi
@@ -28,12 +34,6 @@ let
   };
 in
 {
-  options.repo.lintIgnores = lib.mkOption {
-    type = lib.types.listOf lib.types.str;
-    default = [ ];
-    description = "Globs the shared ast-grep rules skip, for generated files without a generated-code header.";
-  };
-
   config = {
     packages = [
       sharedLint
