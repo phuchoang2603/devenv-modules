@@ -51,6 +51,15 @@ in
     };
     git-hooks.hooks.treefmt.enable = true;
 
+    tasks."repo:worktree-hooks" = {
+      exec = ''
+        git_dir="$(git -C "${config.devenv.root}" rev-parse --path-format=absolute --git-dir 2>/dev/null)" || exit 0
+        git -C "${config.devenv.root}" config extensions.worktreeConfig true
+        git -C "${config.devenv.root}" config --worktree core.hooksPath "$git_dir/hooks"
+      '';
+      before = [ "devenv:git-hooks:install" ];
+    };
+
     tasks."repo:lint".exec = ''
       repo-lint-shared
       bash "${config.git.root}/scripts/lint.sh"
