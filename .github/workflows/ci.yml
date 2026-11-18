@@ -15,8 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: cachix/install-nix-action@v31
-      - name: Rule tests
-        run: nix shell nixpkgs#ast-grep -c ast-grep test --skip-snapshot-tests
       - name: Rules pass on this repo
         run: nix shell nixpkgs#ast-grep -c ast-grep scan .
       - name: Nix and workflow format

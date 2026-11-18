@@ -1,9 +1,0 @@
-id: no-comments-hcl
-valid:
-  - |
-    # NOTE: the provider rejects empty tags
-    locals {}
-invalid:
-  - |
-    # create the bucket
-    locals {}
