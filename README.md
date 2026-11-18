@@ -50,6 +50,6 @@ jobs:
       run: devenv tasks run repo:check
 ```
 
-The workflow restores the Go build and module caches, the uv cache and the Maven repository on every run, keyed by `cache-key` (pass one per matrix entry) and the `go.sum`/`uv.lock`/`pom.xml` hashes; only `main` saves them. It also takes `fetch-depth`, `timeout-minutes`, `cache-path`/`cache-key`/`cache-hash-files` for extra caches, and `artifact-name`/`artifact-path` to upload results even when the run fails.
+The workflow restores the Go build and module caches and the Maven repository on every run, keyed by `cache-key` (pass one per matrix entry) and the `go.sum`/`pom.xml` hashes; only `main` saves them. It also takes `fetch-depth`, `timeout-minutes`, `cache-path`/`cache-key`/`cache-hash-files` for extra caches, and `artifact-name`/`artifact-path` to upload results even when the run fails.
 
 Update a project with `devenv update devenv-modules`. To try local changes first, run `devenv shell --override-input devenv-modules path:../devenv-modules`.
