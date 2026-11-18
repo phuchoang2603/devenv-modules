@@ -62,12 +62,33 @@ jobs:
           restore-keys: |
             ${{ inputs.cache-key }}-${{ hashFiles(inputs.cache-hash-files) }}-
             ${{ inputs.cache-key }}-
+      - id: toolchain-key
+        env:
+          KEY: toolchain-${{ inputs.cache-key || github.job }}-${{ hashFiles('**/go.sum', '**/uv.lock') }}
+        run: echo "key=$KEY" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v4
+        id: toolchain
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.cache/uv
+            .devenv/state/go/pkg/mod
+          key: ${{ steps.toolchain-key.outputs.key }}
+          restore-keys: toolchain-${{ inputs.cache-key || github.job }}-
       - name: Install devenv
         run: nix profile add nixpkgs#devenv
       - name: Run
         env:
           RUN: ${{ inputs.run }}
         run: devenv shell -- bash -euo pipefail -c "$RUN"
+      - uses: actions/cache/save@v4
+        if: success() && github.ref == 'refs/heads/main' && steps.toolchain.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.cache/uv
+            .devenv/state/go/pkg/mod
+          key: ${{ steps.toolchain-key.outputs.key }}
       - id: artifact
         if: always() && inputs.artifact-path != ''
         env:
